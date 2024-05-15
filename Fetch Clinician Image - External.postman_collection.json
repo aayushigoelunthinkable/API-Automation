@@ -1,0 +1,3973 @@
+{
+	"info": {
+		"_postman_id": "33ec826b-4197-452d-b9c8-d29aa522c0c1",
+		"name": "Fetch Clinician Image - External",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27648431",
+		"_collection_link": "https://sqh-limited.postman.co/workspace/Aayushi---Workspace~65133248-e055-45b7-8dad-6867829d3dcf/collection/27648431-33ec826b-4197-452d-b9c8-d29aa522c0c1?action=share&source=collection_link&creator=27648431"
+	},
+	"item": [
+		{
+			"name": "Clinician Image",
+			"item": [
+				{
+					"name": "Positive Cases",
+					"item": [
+						{
+							"name": "Cases for clinicianId",
+							"item": [
+								{
+									"name": "Fetches a image of a specified clinician using clinicianId with spaces before and after",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse = new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													"let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"// Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"imageUrl\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response time\r",
+													" */\r",
+													"(function testAPIResponseTime() {\r",
+													"    pm.test(\"API response time is below 3 second\", () => {\r",
+													"        pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testAPIResponseCode() {\r",
+													"    pm.test(\"API returned valid response code\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData).forEach((key) => {\r",
+													"            pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"        });\r",
+													"    });\r",
+													"        \r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testResponseKeyDataTypes() {\r",
+													"    pm.test(\"API response keys has valid data type\", () => {\r",
+													"            Object.keys(responseData).forEach((key) => {\r",
+													"                pm.expect(allowedKeysInResponse.get(key)).equals(typeof (responseData[key]));\r",
+													"            });\r",
+													"            \r",
+													"\r",
+													"                });\r",
+													"\r",
+													"            })();\r",
+													"\r",
+													"\r",
+													"            \r",
+													"       \r",
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician2}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/ {{ClinicianId1}} /image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												" {{ClinicianId1}} ",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using correct clinician Id for GP",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse = new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													"let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"// Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"imageUrl\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response time\r",
+													" */\r",
+													"(function testAPIResponseTime() {\r",
+													"    pm.test(\"API response time is below 3 second\", () => {\r",
+													"        pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testAPIResponseCode() {\r",
+													"    pm.test(\"API returned valid response code\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData).forEach((key) => {\r",
+													"            pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"        });\r",
+													"    });\r",
+													"        \r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testResponseKeyDataTypes() {\r",
+													"    pm.test(\"API response keys has valid data type\", () => {\r",
+													"            Object.keys(responseData).forEach((key) => {\r",
+													"                pm.expect(allowedKeysInResponse.get(key)).equals(typeof (responseData[key]));\r",
+													"            });\r",
+													"            \r",
+													"\r",
+													"                });\r",
+													"\r",
+													"            })();\r",
+													"\r",
+													"\r",
+													"            \r",
+													"       \r",
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician2}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImg}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImg}}",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using correct clinician Id for physio.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse = new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													"let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"// Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"imageUrl\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response time\r",
+													" */\r",
+													"(function testAPIResponseTime() {\r",
+													"    pm.test(\"API response time is below 3 second\", () => {\r",
+													"        pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testAPIResponseCode() {\r",
+													"    pm.test(\"API returned valid response code\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData).forEach((key) => {\r",
+													"            pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"        });\r",
+													"    });\r",
+													"        \r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testResponseKeyDataTypes() {\r",
+													"    pm.test(\"API response keys has valid data type\", () => {\r",
+													"            Object.keys(responseData).forEach((key) => {\r",
+													"                pm.expect(allowedKeysInResponse.get(key)).equals(typeof (responseData[key]));\r",
+													"            });\r",
+													"            \r",
+													"\r",
+													"                });\r",
+													"\r",
+													"            })();\r",
+													"\r",
+													"\r",
+													"            \r",
+													"       \r",
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician2}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImg2}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImg2}}",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using correct clinician Id for mental health.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse = new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													"let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"// Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"imageUrl\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response time\r",
+													" */\r",
+													"(function testAPIResponseTime() {\r",
+													"    pm.test(\"API response time is below 3 second\", () => {\r",
+													"        pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testAPIResponseCode() {\r",
+													"    pm.test(\"API returned valid response code\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData).forEach((key) => {\r",
+													"            pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"        });\r",
+													"    });\r",
+													"        \r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testResponseKeyDataTypes() {\r",
+													"    pm.test(\"API response keys has valid data type\", () => {\r",
+													"            Object.keys(responseData).forEach((key) => {\r",
+													"                pm.expect(allowedKeysInResponse.get(key)).equals(typeof (responseData[key]));\r",
+													"            });\r",
+													"            \r",
+													"\r",
+													"                });\r",
+													"\r",
+													"            })();\r",
+													"\r",
+													"\r",
+													"            \r",
+													"       \r",
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician2}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImg3}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImg3}}",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Cases for API key",
+							"item": [
+								{
+									"name": "Fetches a image of a specified clinician using correct api key.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse = new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													"let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"// Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"imageUrl\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response time\r",
+													" */\r",
+													"(function testAPIResponseTime() {\r",
+													"    pm.test(\"API response time is below 3 second\", () => {\r",
+													"        pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testAPIResponseCode() {\r",
+													"    pm.test(\"API returned valid response code\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData).forEach((key) => {\r",
+													"            pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"        });\r",
+													"    });\r",
+													"        \r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testResponseKeyDataTypes() {\r",
+													"    pm.test(\"API response keys has valid data type\", () => {\r",
+													"            Object.keys(responseData).forEach((key) => {\r",
+													"                pm.expect(allowedKeysInResponse.get(key)).equals(typeof (responseData[key]));\r",
+													"            });\r",
+													"            \r",
+													"\r",
+													"                });\r",
+													"\r",
+													"            })();\r",
+													"\r",
+													"\r",
+													"            \r",
+													"       \r",
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician2}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImg}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImg}}",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician with api keys with spaces.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse = new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													"let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"// Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"imageUrl\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response time\r",
+													" */\r",
+													"(function testAPIResponseTime() {\r",
+													"    pm.test(\"API response time is below 3 second\", () => {\r",
+													"        pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testAPIResponseCode() {\r",
+													"    pm.test(\"API returned valid response code\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData).forEach((key) => {\r",
+													"            pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"        });\r",
+													"    });\r",
+													"        \r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testResponseKeyDataTypes() {\r",
+													"    pm.test(\"API response keys has valid data type\", () => {\r",
+													"            Object.keys(responseData).forEach((key) => {\r",
+													"                pm.expect(allowedKeysInResponse.get(key)).equals(typeof (responseData[key]));\r",
+													"            });\r",
+													"            \r",
+													"\r",
+													"                });\r",
+													"\r",
+													"            })();\r",
+													"\r",
+													"\r",
+													"            \r",
+													"       \r",
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "   {{API key clinician2}}  ",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImg}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImg}}",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using API key of different organisation",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse = new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													"let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"// Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"imageUrl\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response time\r",
+													" */\r",
+													"(function testAPIResponseTime() {\r",
+													"    pm.test(\"API response time is below 3 second\", () => {\r",
+													"        pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testAPIResponseCode() {\r",
+													"    pm.test(\"API returned valid response code\", function () {\r",
+													"        pm.response.to.have.status(200);\r",
+													"    });\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData).forEach((key) => {\r",
+													"            pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"        });\r",
+													"    });\r",
+													"        \r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"(function testResponseKeyDataTypes() {\r",
+													"    pm.test(\"API response keys has valid data type\", () => {\r",
+													"            Object.keys(responseData).forEach((key) => {\r",
+													"                pm.expect(allowedKeysInResponse.get(key)).equals(typeof (responseData[key]));\r",
+													"            });\r",
+													"            \r",
+													"\r",
+													"                });\r",
+													"\r",
+													"            })();\r",
+													"\r",
+													"\r",
+													"            \r",
+													"       \r",
+													"\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician2}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImg2}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImg2}}",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Negative Cases",
+					"item": [
+						{
+							"name": "Cases for clinicianId",
+							"item": [
+								{
+									"name": "Fetches a image of a specified clinician using clinicianId with spaces in between",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"clinicianId\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(422);\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData.errors).forEach((key) => {\r",
+													"        pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"    });      \r",
+													"    \r",
+													"   });   \r",
+													"})();"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician1}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImgspace}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImgspace}}",
+												"image"
+											]
+										},
+										"description": "Fetches a image of a specified clinician."
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician with clinician Id as number with 18 characters.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(404);\r",
+													"        });\r",
+													"    })();\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician1}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/123456789012345678/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"123456789012345678",
+												"image"
+											]
+										},
+										"description": "Fetches a image of a specified clinician."
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician with clinician Id as alphabets with 18 characters.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(404);\r",
+													"        });\r",
+													"    })();\r",
+													""
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician1}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/ABCDEFGYUIOPlmnbvd/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"ABCDEFGYUIOPlmnbvd",
+												"image"
+											]
+										},
+										"description": "Fetches a image of a specified clinician."
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using clinicianId with only spaces",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"clinicianId\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(422);\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData.errors).forEach((key) => {\r",
+													"        pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"    });      \r",
+													"    \r",
+													"   });   \r",
+													"})();"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician1}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "123e4567-e89b-12d3-a456-426655440000"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/       /image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"       ",
+												"image"
+											]
+										},
+										"description": "Fetches a image of a specified clinician."
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using clinicianId with null",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"clinicianId\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(422);\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData.errors).forEach((key) => {\r",
+													"        pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"    });      \r",
+													"    \r",
+													"   });   \r",
+													"})();"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician1}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "123e4567-e89b-12d3-a456-426655440000"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"image"
+											]
+										},
+										"description": "Fetches a image of a specified clinician."
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using clinicianId with numbers",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"clinicianId\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(422);\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData.errors).forEach((key) => {\r",
+													"        pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"    });      \r",
+													"    \r",
+													"   });   \r",
+													"})();"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician1}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "123e4567-e89b-12d3-a456-426655440000"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/1234567890123456789/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"1234567890123456789",
+												"image"
+											]
+										},
+										"description": "Fetches a image of a specified clinician."
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using clinicianId with special characters.",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * Setting-up the test cases environment and required data\r",
+													" */\r",
+													"(function setup() {\r",
+													"    // Setting allowed response keys in map in chainable operation\r",
+													"    allowedKeysInResponse.set(\"clinicianId\", \"string\");\r",
+													"\r",
+													"})();\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(422);\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response keys coming in response\r",
+													" */\r",
+													"\r",
+													"(function testAllowedKeysInResponse() {\r",
+													"    pm.test(\"API returned valid response keys\", function () {\r",
+													"        Object.keys(responseData.errors).forEach((key) => {\r",
+													"        pm.expect(allowedKeysInResponse.has(key)).equals(true)\r",
+													"    });      \r",
+													"    \r",
+													"   });   \r",
+													"})();"
+												],
+												"type": "text/javascript",
+												"packages": {}
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key clinician1}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/!@#$%^&*()_+|}{[]\\:\"';<>?/.,<>,.?/|| /image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"!@"
+											],
+											"hash": "$%^&*()_+|}{[]\\:\"';<>?/.,<>,.?/|| /image"
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Cases for API key",
+							"item": [
+								{
+									"name": "Fetches a image of a specified clinician using API key with special charecters",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(401);\r",
+													"        });\r",
+													"    })();\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{API key baca}}3#$%^&&&():\"<>?",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImg}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImg}}",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using API key with spaces in between",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(401);\r",
+													"        });\r",
+													"    })();\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "{{apkeybacaspaces}}",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImg}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImg}}",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using API key with only spaces",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(401);\r",
+													"        });\r",
+													"    })();\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "    ",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/ {{clinicianImg}} /image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												" {{clinicianImg}} ",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using API key with null",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(401);\r",
+													"        });\r",
+													"    })();\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImg}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImg}}",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								},
+								{
+									"name": "Fetches a image of a specified clinician using API key with numbers",
+									"event": [
+										{
+											"listen": "prerequest",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * Loading required dependencies\r",
+													" */\r",
+													"var CryptoJS = require(\"crypto-js\");\r",
+													"\r",
+													"/**\r",
+													" * Variable for scripts\r",
+													" */\r",
+													"\r",
+													"// Setting the required request data\r",
+													"let requestData = {\r",
+													"    name: \"Jason Smith\",\r",
+													"    address: \"Some random stret, Churchill Road, UK\",\r",
+													"    mobile: \"+447656789876\",\r",
+													"    dob: \"1996-04-04\"\r",
+													"};\r",
+													"\r",
+													"// Defining threshold for \r",
+													"let threshold = pm.environment.get('jwtExpiryThreshold');\r",
+													"\r",
+													"// Hash value of JWT secret\r",
+													"let jwtSecretKey = pm.environment.get('jwtSecretHash');\r",
+													"\r",
+													"// Generating UTC timestamp\r",
+													"let timeStamp = Math.floor(Date.now() / 1000);\r",
+													"\r",
+													"// Generating token payload \r",
+													"let tokenPayload = {\r",
+													"    time: timeStamp,\r",
+													"    exp: timeStamp + threshold,\r",
+													"    \"ray-id\": function () {\r",
+													"        requestData.expiry = expiry;\r",
+													"        return JSON.stringify(requestData);\r",
+													"    }\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating and setting JWT in environment variable via self executing function\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function generateJwt(tokenPayload, jwtSecretKey) {\r",
+													"    const header = {\r",
+													"        \"alg\": \"HS256\",\r",
+													"        \"typ\": \"JWT\"\r",
+													"    }\r",
+													"    var encodedHeaders = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));\r",
+													"    var encodedPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(tokenPayload)));\r",
+													"\r",
+													"    const encodedSignature = base64url(CryptoJS.HmacSHA256(`${encodedHeaders}.${encodedPayload}`, jwtSecretKey));\r",
+													"    return `${encodedHeaders}.${encodedPayload}.${encodedSignature}`;\r",
+													"}\r",
+													"\r",
+													"/**\r",
+													" * Generating base64Url encoded data\r",
+													" * @param source object\r",
+													" * @returns string\r",
+													" */\r",
+													"function base64url(source) {\r",
+													"    // Encode in classical base64\r",
+													"    encodedSource = CryptoJS.enc.Base64.stringify(source);\r",
+													"\r",
+													"    // Remove padding equal characters\r",
+													"    encodedSource = encodedSource.replace(/=+$/, '');\r",
+													"\r",
+													"    // Replace characters according to base64url specifications\r",
+													"    encodedSource = encodedSource.replace(/\\+/g, '-');\r",
+													"    encodedSource = encodedSource.replace(/\\//g, '_');\r",
+													"\r",
+													"    return encodedSource;\r",
+													"}\r",
+													"\r",
+													"pm.variables.set(\"xrequestId\", generateJwt(tokenPayload, jwtSecretKey));"
+												],
+												"type": "text/javascript"
+											}
+										},
+										{
+											"listen": "test",
+											"script": {
+												"exec": [
+													"/**\r",
+													" * ====================================\r",
+													" * Setup script variabes\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													" // Response returned from API\r",
+													"let responseData = pm.response.json();\r",
+													"\r",
+													"\r",
+													"// List of allowed keys in the response\r",
+													"let allowedKeysInResponse=new Map();\r",
+													"\r",
+													"// Fetching the ResponseTime from Configuration\r",
+													" let expectedTime = pm.variables.get(\"expectedTimeInSeconds\");\r",
+													"\r",
+													"\r",
+													"\r",
+													"/**\r",
+													" * ====================================\r",
+													" * Test cases\r",
+													" * ====================================\r",
+													" */\r",
+													"\r",
+													"/**\r",
+													"  * @test Valid response has valid response time\r",
+													" */\r",
+													"    (function testAPIResponseTime() {\r",
+													"        pm.test(\"API response time is below 3 seconds\", () => {\r",
+													"            pm.expect(pm.response.responseTime).lte(parseInt(expectedTime));\r",
+													"        });\r",
+													"    })();\r",
+													"\r",
+													"/**\r",
+													" * @test Valid response has valid response code\r",
+													" */\r",
+													"\r",
+													"    (function testAPIResponseCode() {\r",
+													"        pm.test(\"API returned valid response code\", function () {\r",
+													"            pm.response.to.have.status(401);\r",
+													"        });\r",
+													"    })();\r",
+													""
+												],
+												"type": "text/javascript"
+											}
+										}
+									],
+									"request": {
+										"auth": {
+											"type": "apikey",
+											"apikey": [
+												{
+													"key": "value",
+													"value": "132456272829209873678930300",
+													"type": "string"
+												},
+												{
+													"key": "key",
+													"value": "x-api-key",
+													"type": "string"
+												},
+												{
+													"key": "in",
+													"value": "header",
+													"type": "string"
+												}
+											]
+										},
+										"method": "GET",
+										"header": [
+											{
+												"description": "(Required) This header provides us with a unique trace ID to track the request through our platform. Please generate a unique string, e.g. a guid.\n",
+												"key": "X-Request-Id",
+												"value": "{{xrequestId}}"
+											},
+											{
+												"key": "Accept",
+												"value": "application/json"
+											}
+										],
+										"url": {
+											"raw": "{{baseUrlExternalUser}}/clinicians/v1/{{clinicianImg}}/image",
+											"host": [
+												"{{baseUrlExternalUser}}"
+											],
+											"path": [
+												"clinicians",
+												"v1",
+												"{{clinicianImg}}",
+												"image"
+											]
+										},
+										"description": "Fetches details of a specified clinician"
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}
